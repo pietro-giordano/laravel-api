@@ -17,6 +17,12 @@ class ProjectController extends Controller
     {
         $projects = Project::with('type', 'technologies')->paginate(10);
 
+        foreach ($projects as $project) {
+            if ($project->image) {
+                $project->image = asset('storage/' . $project->image);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'code' => 200,
