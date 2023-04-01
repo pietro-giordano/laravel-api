@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use Exception;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -58,9 +59,28 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        try {
+            $project = Project::where('slug', $slug)->with('type', 'technologies')->firstOrFail();
+
+            if ($project->image) {
+                $project->image = asset('storage/' . $project->image);
+            }
+
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'message' => 'Ok',
+                'project' => $project
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
